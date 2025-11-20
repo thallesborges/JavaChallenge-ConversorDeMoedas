@@ -1,13 +1,16 @@
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Principal {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         Scanner scanner = new Scanner(System.in);
+        DecimalFormat df = new DecimalFormat("0.000");
 
-        System.out.println("🪙 Seja bem-vindo(a) ao Conversor de Moedas 💱");
-        Thread.sleep(1000);
+        System.out.println("🪙 Seja muito bem-vindo(a) ao Conversor de Moedas 💱");
+        Thread.sleep(2000);
 
         while (true) {
             List<Moeda> moedas = new ArrayList<>();
@@ -29,19 +32,61 @@ public class Principal {
             moedas.remove(moedaBase);
 
             Thread.sleep(1000);
-
-            ui.limparTela();
             int indexMoedaConverter = ui.operacaoEscolhida(moedaBase, moedas, scanner);
             if (indexMoedaConverter == -1) {
                 Thread.sleep(500);
-                System.out.println("↩️ Você optou por alterar a moeda base, estamos voltando ao menu anterior.");
-                Thread.sleep(3000);
-                ui.limparTela();
+                System.out.println("↩️ Você optou por alterar a moeda, estamos voltando ao menu anterior.");
+                Thread.sleep(2000);
                 continue;
             }
 
             Moeda moedaConverter = moedas.get(indexMoedaConverter);
-            System.out.println("💱 Converter de " + moedaBase + " para " + moedaConverter);
+            System.out.println("✳️ Converter de " + moedaBase + " para " + moedaConverter);
+
+            double valor;
+            while (true) {
+                System.out.print("💸 Insira o valor que deseja converter: ");
+                try {
+                    valor = Double.parseDouble(scanner.nextLine().replace(",", "."));
+                    if (valor <= 0) {
+                        System.out.println("⁉️ Valor inválido! Insira um valor maior que 0.");
+                    }
+                    break;
+                } catch (NumberFormatException e) {
+                    System.out.println("❌ Entrada inválida! Insira um valor numérico positivo.");
+                }
+            }
+
+            ConsultaConversao consultaConversao = new ConsultaConversao();
+            BuscaValorConversao conversao = consultaConversao.valorConversao(moedaBase, moedaConverter, valor);
+            System.out.println("🪙 O valor de " + df.format(valor) + " ["+ moedaBase.getCodigo() + "] equivale a " + df.format(conversao.conversion_result()) + " [" + moedaConverter.getCodigo() + "] em " + moedaConverter.getNome());
+            Thread.sleep(5000);
+
+            int opcao;
+            while (true) {
+                System.out.println("↩️ Deseja fazer outra conversão?");
+                System.out.println("1. Sim");
+                System.out.println("2. Não");
+                System.out.print("💠 Opção: ");
+                try {
+                    opcao = Integer.parseInt(scanner.nextLine());
+                    if (opcao < 0 || opcao > 2) {
+                        System.out.println("❌ Opção inválida! Por favor, insira 1 para 'Sim' ou 2 para 'Não'.");
+                        continue;
+                    }
+                    break;
+                } catch (NumberFormatException e) {
+                    System.out.println("❌ Entrada inválida! Por favor, insira 1 para 'Sim' ou 2 para 'Não'.");
+                }
+            }
+
+            if (opcao == 1) {
+                continue;
+            }
+
+            System.out.println("❇️ Encerrando...");
+            Thread.sleep(500);
+            System.out.println("👋🏻 Obrigado por utilizar nosso sistema, volte sempre!");
             break;
         }
     }
